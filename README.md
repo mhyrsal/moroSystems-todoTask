@@ -35,3 +35,7 @@ Spustí Vite dev server (obvykle na http://localhost:5173).
 
 Bude k tomu potreba spustit i BE podle instrukci v zadani.
 Pokud BE nepobezi FE nebude spravne fungovat ale nejake opatreni tam jsou ;)
+
+### Ukazka
+
+<video src="vid/demo.mov" controls width="600"></video>

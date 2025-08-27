@@ -14,31 +14,21 @@ export const Header: React.FC = () => {
 
     // Check backend connection
     useEffect(() => {
-        let isMounted = true;
-
         const checkConnection = async () => {
             try {
                 const response = await fetch('http://localhost:8080/tasks', {
                     method: 'HEAD',
-                    signal: AbortSignal.timeout(3000),
                 });
-                if (isMounted) {
-                    setIsBackendConnected(response.ok);
-                }
+                setIsBackendConnected(response.ok);
             } catch (error) {
-                if (isMounted) {
-                    setIsBackendConnected(false);
-                }
+                setIsBackendConnected(false);
             }
         };
 
         checkConnection();
-        const interval = setInterval(checkConnection, 5000);
+        const interval = setInterval(checkConnection, 3000);
 
-        return () => {
-            isMounted = false;
-            clearInterval(interval);
-        };
+        return () => clearInterval(interval);
     }, []);
 
     const languages = [

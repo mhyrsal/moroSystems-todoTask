@@ -1,0 +1,51 @@
+{
+    "name": "todo-app-morosystems",
+    "version": "1.0.0",
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "build": "tsc && vite build",
+        "preview": "vite preview",
+        "test": "vitest",
+        "test:ui": "vitest --ui",
+        "lint": "eslint . --ext ts,tsx --report-unused-disable-directives",
+        "type-check": "tsc --noEmit"
+    },
+    "dependencies": {
+        "@hookform/resolvers": "^3.3.4",
+        "@reduxjs/toolkit": "^2.0.1",
+        "clsx": "^2.1.0",
+        "date-fns": "^4.1.0",
+        "framer-motion": "^10.17.0",
+        "lucide-react": "^0.303.0",
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0",
+        "react-hook-form": "^7.48.2",
+        "react-hot-toast": "^2.6.0",
+        "react-redux": "^9.0.4",
+        "tailwindcss": "^3.4.0",
+        "zod": "^3.22.4"
+    },
+    "devDependencies": {
+        "@tailwindcss/forms": "^0.5.10",
+        "@testing-library/jest-dom": "^6.1.5",
+        "@testing-library/react": "^14.1.2",
+        "@types/node": "^24.3.0",
+        "@types/react": "^18.2.45",
+        "@types/react-dom": "^18.2.18",
+        "@typescript-eslint/eslint-plugin": "^6.16.0",
+        "@typescript-eslint/parser": "^6.16.0",
+        "@vitejs/plugin-react": "^4.2.1",
+        "autoprefixer": "^10.4.16",
+        "eslint": "^8.56.0",
+        "eslint-config-prettier": "^10.1.8",
+        "eslint-plugin-prettier": "^5.5.4",
+        "eslint-plugin-react-hooks": "^4.6.0",
+        "msw": "^2.0.11",
+        "postcss": "^8.4.32",
+        "prettier": "^3.6.2",
+        "typescript": "^5.3.3",
+        "vite": "^5.0.10",
+        "vitest": "^1.1.0"
+    }
+}

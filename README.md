@@ -39,4 +39,5 @@ Pokud BE nepobezi FE nebude spravne fungovat ale nejake opatreni tam jsou ;)
 ### Ukazka
 
 [Ukázkové video (.mov)](vid/demo.mov)
-<video src="vid/demo.mov" controls width="600"></video>
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/QjItPQI9zKk?si=PBGjMvB2c-mwtj8l" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>

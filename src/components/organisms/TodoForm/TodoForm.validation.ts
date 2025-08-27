@@ -28,27 +28,8 @@ export const priorityLabels: Record<string, string> = {
     high: 'High Priority',
 };
 
-export const priorityColors = {
-    low: 'text-green-600 bg-green-50',
-    medium: 'text-yellow-600 bg-yellow-50',
-    high: 'text-red-600 bg-red-50',
-};
-
 export const validateTodoForm = (data: unknown) => {
     return todoFormSchema.safeParse(data);
-};
-
-export const validateTag = (tag: string) => {
-    return tagSchema.safeParse(tag);
-};
-
-export const validationMessages = {
-    required: 'This field is required',
-    tooLong: (max: number) => `Must be less than ${max} characters`,
-    tooShort: (min: number) => `Must be at least ${min} characters`,
-    invalidFormat: 'Invalid format',
-    duplicateTag: 'Tag already exists',
-    maxTags: (max: number) => `Maximum ${max} tags allowed`,
 };
 
 export const defaultTodoFormValues: TodoFormData = {
@@ -57,42 +38,4 @@ export const defaultTodoFormValues: TodoFormData = {
     tags: [],
     dueDate: null,
     description: null,
-};
-
-export const todoFormRules = {
-    text: {
-        required: validationMessages.required,
-        minLength: {
-            value: 1,
-            message: validationMessages.tooShort(1),
-        },
-        maxLength: {
-            value: 500,
-            message: validationMessages.tooLong(500),
-        },
-        validate: {
-            notEmpty: (value: string) => value.trim().length > 0 || 'Todo text cannot be only whitespace',
-        },
-    },
-    description: {
-        maxLength: {
-            value: 1000,
-            message: validationMessages.tooLong(1000),
-        },
-    },
-};
-
-export const sanitizeTodoFormData = (data: TodoFormData): TodoFormData => {
-    return {
-        ...data,
-        text: data.text.trim(),
-        description: data.description?.trim() || null,
-        tags: data.tags?.map((tag) => tag.trim()).filter(Boolean) || [],
-        priority: data.priority || null,
-        dueDate: data.dueDate || null,
-    };
-};
-
-export const isFormEmpty = (data: TodoFormData): boolean => {
-    return !data.text.trim() && !data.priority && (!data.tags || data.tags.length === 0) && !data.dueDate && !data.description?.trim();
 };

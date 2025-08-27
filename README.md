@@ -38,4 +38,5 @@ Pokud BE nepobezi FE nebude spravne fungovat ale nejake opatreni tam jsou ;)
 
 ### Ukazka
 
+[Ukázkové video (.mov)](vid/demo.mov)
 <video src="vid/demo.mov" controls width="600"></video>

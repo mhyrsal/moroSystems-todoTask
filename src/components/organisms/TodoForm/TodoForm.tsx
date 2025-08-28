@@ -22,10 +22,13 @@ export const TodoForm: React.FC = () => {
         register,
         handleSubmit,
         reset,
+        watch,
         formState: { errors },
     } = useForm<TodoFormData>({
         resolver: zodResolver(todoSchema),
     });
+
+    const watchedPriority = watch('priority');
 
     const onSubmit = async (data: TodoFormData) => {
         try {
@@ -35,6 +38,8 @@ export const TodoForm: React.FC = () => {
             console.error('Failed to create todo:', error);
         }
     };
+
+    const isButtonDisabled = !watchedPriority || isLoading;
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="flex gap-3 p-4 bg-white rounded-lg shadow-md">
@@ -49,7 +54,7 @@ export const TodoForm: React.FC = () => {
                 <option value="high">{t('high')}</option>
             </select>
 
-            <Button type="submit" loading={isLoading} icon={<Plus className="w-5 h-5" />}>
+            <Button type="submit" loading={isLoading} disabled={isButtonDisabled} icon={<Plus className="w-5 h-5" />}>
                 {t('add')}
             </Button>
         </form>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, forwardRef } from 'react';
 import { motion } from 'framer-motion';
 import { Check, Trash2, Edit2, Star, X, Save, Clock, Calendar } from 'lucide-react';
 import { clsx } from 'clsx';
@@ -12,7 +12,7 @@ import { useUpdateTodoMutation, useDeleteTodoMutation } from '@features/todos/to
 import { toast } from '@utils/toast';
 import { useTranslation } from '@/hooks/useTranslation';
 
-export const TodoItem: React.FC<TodoItemProps> = ({ todo, isOptimistic = false }) => {
+export const TodoItem = forwardRef<HTMLDivElement, TodoItemProps>(({ todo, isOptimistic = false }, ref) => {
     const [isEditing, setIsEditing] = useState(false);
     const [editText, setEditText] = useState(todo.text);
     const { t } = useTranslation();
@@ -67,6 +67,7 @@ export const TodoItem: React.FC<TodoItemProps> = ({ todo, isOptimistic = false }
                 id: todo.id,
                 updates: { starred: !todo.starred },
             }).unwrap();
+            toast.success('Todo rating updated');
         } catch (error) {
             console.error('Failed to star todo:', error);
         }
@@ -79,6 +80,7 @@ export const TodoItem: React.FC<TodoItemProps> = ({ todo, isOptimistic = false }
 
     return (
         <motion.div
+            ref={ref}
             layout
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: isOptimistic ? 0.6 : 1, y: 0 }}
@@ -200,4 +202,6 @@ export const TodoItem: React.FC<TodoItemProps> = ({ todo, isOptimistic = false }
             )}
         </motion.div>
     );
-};
+});
+
+TodoItem.displayName = 'TodoItem';

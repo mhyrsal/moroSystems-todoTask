@@ -8,10 +8,10 @@ const transformTaskToTodo = (task: Task): Todo => ({
     text: task.text,
     completed: task.completed,
     createdAt: new Date(task.createdDate).toISOString(),
-    completedAt: task.completedDate ? new Date(task.completedDate).toISOString() : null,
-    priority: undefined,
-    tags: [],
-    starred: false,
+    completedAt: task.completedDate && task.completedDate !== 0 ? new Date(task.completedDate).toISOString() : null,
+    priority: task.priority,
+    tags: task.tags || [],
+    starred: task.starred ?? false,
 });
 
 export const todosApi = createApi({
@@ -35,20 +35,17 @@ export const todosApi = createApi({
                 result ? [...result.map(({ id }) => ({ type: 'Todo' as const, id })), { type: 'Todo', id: 'LIST' }] : [{ type: 'Todo', id: 'LIST' }],
         }),
 
-        getTodo: builder.query<Todo, string>({
-            query: (id) => `/tasks/${id}`,
-            transformResponse: (response: Task) => transformTaskToTodo(response),
-            providesTags: (result, error, id) => [{ type: 'Todo', id }],
-        }),
-
         createTodo: builder.mutation<Todo, CreateTodoDto>({
             query: (todo) => ({
                 url: '/tasks',
                 method: 'POST',
-                body: { text: todo.text },
+                body: {
+                    text: todo.text,
+                    priority: todo.priority,
+                    tags: todo.tags,
+                },
             }),
             transformResponse: (response: Task) => transformTaskToTodo(response),
-            // Optimistic update for create
             async onQueryStarted(todo, { dispatch, queryFulfilled }) {
                 const tempId = `temp-${Date.now()}`;
                 const optimisticTodo: Todo = {
@@ -70,7 +67,6 @@ export const todosApi = createApi({
 
                 try {
                     const { data: createdTodo } = await queryFulfilled;
-                    // Replace temp todo with real one
                     dispatch(
                         todosApi.util.updateQueryData('getTodos', undefined, (draft) => {
                             const index = draft.findIndex((t) => t.id === tempId);
@@ -86,28 +82,12 @@ export const todosApi = createApi({
         }),
 
         updateTodo: builder.mutation<Todo, { id: string; updates: UpdateTodoDto }>({
-            query: ({ id, updates }) => {
-                if (updates.completed !== undefined) {
-                    return {
-                        url: `/tasks/${id}/${updates.completed ? 'complete' : 'incomplete'}`,
-                        method: 'POST',
-                    };
-                }
-                if (updates.text) {
-                    return {
-                        url: `/tasks/${id}`,
-                        method: 'POST',
-                        body: { text: updates.text },
-                    };
-                }
-                return {
-                    url: `/tasks/${id}`,
-                    method: 'POST',
-                    body: { text: updates.text || '' },
-                };
-            },
+            query: ({ id, updates }) => ({
+                url: `/tasks/${id}`,
+                method: 'POST',
+                body: updates,
+            }),
             transformResponse: (response: Task) => transformTaskToTodo(response),
-            // Optimistic update for update
             async onQueryStarted({ id, updates }, { dispatch, queryFulfilled }) {
                 const patchResult = dispatch(
                     todosApi.util.updateQueryData('getTodos', undefined, (draft) => {
@@ -133,12 +113,18 @@ export const todosApi = createApi({
             },
         }),
 
-        deleteTodo: builder.mutation<void, string>({
+        deleteTodo: builder.mutation<{ message: string }, string>({
             query: (id) => ({
                 url: `/tasks/${id}`,
                 method: 'DELETE',
             }),
-            // Optimistic update for delete
+            transformResponse: (response: any) => {
+                // This is the key fix - handle the plain text response
+                if (typeof response === 'string') {
+                    return { message: response };
+                }
+                return response || { message: 'Task deleted' };
+            },
             async onQueryStarted(id, { dispatch, queryFulfilled }) {
                 const patchResult = dispatch(
                     todosApi.util.updateQueryData('getTodos', undefined, (draft) => {
@@ -167,7 +153,6 @@ export const todosApi = createApi({
 
         deleteAllCompleted: builder.mutation<void, void>({
             async onQueryStarted(arg, { dispatch, queryFulfilled }) {
-                // Optimisticky odstranit všechny completed
                 const patchResult = dispatch(
                     todosApi.util.updateQueryData('getTodos', undefined, (draft) => {
                         return draft.filter((todo) => !todo.completed);
@@ -177,15 +162,14 @@ export const todosApi = createApi({
                 try {
                     await queryFulfilled;
                 } catch {
-                    patchResult.undo(); // Vrátit zpět při chybě
+                    patchResult.undo();
                 }
             },
             queryFn: async (arg, api, extraOptions, baseQuery) => {
-                const tasksResult = await baseQuery('/tasks');
-                if (tasksResult.error) return { error: tasksResult.error };
+                const completedResult = await baseQuery('/tasks/completed');
+                if (completedResult.error) return { error: completedResult.error };
 
-                const tasks = tasksResult.data as Task[];
-                const completedTasks = tasks.filter((t) => t.completed);
+                const completedTasks = completedResult.data as Task[];
 
                 for (const task of completedTasks) {
                     await baseQuery({
@@ -200,7 +184,6 @@ export const todosApi = createApi({
 
         toggleAllTodos: builder.mutation<void, boolean>({
             async onQueryStarted(shouldComplete, { dispatch, queryFulfilled }) {
-                // Optimisticky označit všechny
                 const patchResult = dispatch(
                     todosApi.util.updateQueryData('getTodos', undefined, (draft) => {
                         draft.forEach((todo) => {
@@ -213,7 +196,7 @@ export const todosApi = createApi({
                 try {
                     await queryFulfilled;
                 } catch {
-                    patchResult.undo(); // Vrátit zpět při chybě
+                    patchResult.undo();
                 }
             },
             queryFn: async (shouldComplete, api, extraOptions, baseQuery) => {
@@ -239,7 +222,6 @@ export const todosApi = createApi({
 
 export const {
     useGetTodosQuery,
-    useGetTodoQuery,
     useCreateTodoMutation,
     useUpdateTodoMutation,
     useDeleteTodoMutation,

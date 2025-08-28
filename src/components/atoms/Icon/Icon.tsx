@@ -11,7 +11,7 @@ interface IconProps {
 }
 
 export const Icon: React.FC<IconProps> = ({ name, size = 20, className, color, onClick }) => {
-    const IconComponent = LucideIcons[name] as React.ComponentType<any>;
+    const IconComponent = LucideIcons[name] as React.ComponentType<React.SVGProps<SVGSVGElement>>;
 
     if (!IconComponent) {
         console.warn(`Icon ${name} not found`);

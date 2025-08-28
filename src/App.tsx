@@ -19,18 +19,12 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
         this.state = { hasError: false };
     }
 
-    static getDerivedStateFromError(error: Error): ErrorBoundaryState {
-        return { hasError: true };
-    }
-
     componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-        // Zde můžeš logovat chybu (např. do konzole, Sentry atd.)
         console.error('Uncaught error:', error, errorInfo);
     }
 
     render() {
         if (this.state.hasError) {
-            // Fallback UI – můžeš přizpůsobit (např. přidat tlačítko pro reload)
             return (
                 <div className="error-fallback">
                     <h1>Něco se pokazilo.</h1>

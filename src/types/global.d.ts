@@ -39,10 +39,10 @@ declare global {
 
 // Custom event types
 interface CustomEventMap {
-    'local-storage': CustomEvent<{ key: string; newValue: any }>;
+    'local-storage': CustomEvent<{ key: string; newValue: unknown }>;
     'theme-change': CustomEvent<{ theme: 'light' | 'dark' }>;
     'language-change': CustomEvent<{ language: 'en' | 'cs' }>;
-    'todo-update': CustomEvent<{ todoId: string; updates: any }>;
+    'todo-update': CustomEvent<{ todoId: string; updates: Record<string, unknown> }>;
     'sync-complete': CustomEvent<{ timestamp: string }>;
 }
 
@@ -81,7 +81,7 @@ type Entries<T> = {
 
 type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
 
-type AsyncReturnType<T extends (...args: any) => Promise<any>> = T extends (...args: any) => Promise<infer R> ? R : any;
+type AsyncReturnType<T extends (...args: unknown[]) => Promise<unknown>> = T extends (...args: unknown[]) => Promise<infer R> ? R : unknown;
 
 type Await<T> = T extends PromiseLike<infer U> ? U : T;
 

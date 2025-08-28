@@ -20,9 +20,7 @@ export const StatsBar: React.FC = () => {
     return (
         <div className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
             <div className="flex flex-col gap-4">
-                {/* Stats Row */}
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    {/* Stats Cards */}
                     <div className="flex items-center gap-4 sm:gap-6">
                         <div className="text-center sm:text-left">
                             <p className="text-sm text-gray-500 dark:text-gray-400">{t('active')}</p>

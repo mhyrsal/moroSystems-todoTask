@@ -118,8 +118,7 @@ export const todosApi = createApi({
                 url: `/tasks/${id}`,
                 method: 'DELETE',
             }),
-            transformResponse: (response: any) => {
-                // This is the key fix - handle the plain text response
+            transformResponse: (response: string | { message: string }) => {
                 if (typeof response === 'string') {
                     return { message: response };
                 }
@@ -152,7 +151,7 @@ export const todosApi = createApi({
         }),
 
         deleteAllCompleted: builder.mutation<void, void>({
-            async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+            async onQueryStarted(_, { dispatch, queryFulfilled }) {
                 const patchResult = dispatch(
                     todosApi.util.updateQueryData('getTodos', undefined, (draft) => {
                         return draft.filter((todo) => !todo.completed);
@@ -165,7 +164,7 @@ export const todosApi = createApi({
                     patchResult.undo();
                 }
             },
-            queryFn: async (arg, api, extraOptions, baseQuery) => {
+            queryFn: async (_, _api, _extraOptions, baseQuery) => {
                 const completedResult = await baseQuery('/tasks/completed');
                 if (completedResult.error) return { error: completedResult.error };
 
@@ -199,7 +198,7 @@ export const todosApi = createApi({
                     patchResult.undo();
                 }
             },
-            queryFn: async (shouldComplete, api, extraOptions, baseQuery) => {
+            queryFn: async (shouldComplete, _api, _extraOptions, baseQuery) => {
                 const tasksResult = await baseQuery('/tasks');
                 if (tasksResult.error) return { error: tasksResult.error };
 

@@ -11,6 +11,7 @@ import { Badge } from '@components/atoms/Badge';
 import { useUpdateTodoMutation, useDeleteTodoMutation } from '@features/todos/todosApi';
 import { toast } from '@utils/toast';
 import { useTranslation } from '@/hooks/useTranslation';
+import { UpdateTodoDto } from '@/features/todos/todos.types';
 
 type Priority = 'low' | 'medium' | 'high' | undefined;
 
@@ -51,7 +52,7 @@ export const TodoItem = forwardRef<HTMLDivElement, TodoItemProps>(({ todo, isOpt
 
         if (textChanged || priorityChanged) {
             try {
-                const updates: any = {};
+                const updates: Partial<UpdateTodoDto> = {};
                 if (textChanged) updates.text = editText.trim();
                 if (priorityChanged) updates.priority = editPriority;
 
@@ -159,7 +160,6 @@ export const TodoItem = forwardRef<HTMLDivElement, TodoItemProps>(({ todo, isOpt
                         className="flex-1"
                     />
 
-                    {/* Priority Selection */}
                     <div className="flex items-center gap-2">
                         <span className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">
                             <AlertCircle className="w-4 h-4" />
@@ -183,7 +183,6 @@ export const TodoItem = forwardRef<HTMLDivElement, TodoItemProps>(({ todo, isOpt
                         </div>
                     </div>
 
-                    {/* Action Buttons */}
                     <div className="flex gap-2">
                         <Button onClick={handleSave} size="sm" variant="success" icon={<Save className="w-4 h-4" />} disabled={isUpdating} loading={isUpdating}>
                             {t('save')}

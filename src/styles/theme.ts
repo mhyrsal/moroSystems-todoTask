@@ -205,10 +205,14 @@ export type Theme = typeof theme;
 // Helper functions for theme values
 export const getColor = (path: string) => {
     const keys = path.split('.');
-    let value: any = theme.colors;
+    let value: unknown = theme.colors;
 
     for (const key of keys) {
-        value = value[key];
+        if (value && typeof value === 'object' && !Array.isArray(value)) {
+            value = (value as Record<string, unknown>)[key];
+        } else {
+            return undefined;
+        }
         if (value === undefined) return undefined;
     }
 

@@ -72,7 +72,7 @@ export const showToast = {
         return toast.loading(message, { ...loadingOptions, ...options });
     },
 
-    custom: (message: Renderable | ValueOrFunction<Renderable, any>, options?: ToastOptions) => {
+    custom: (message: Renderable | ValueOrFunction<Renderable, unknown>, options?: ToastOptions) => {
         return toast.custom(message, { ...defaultOptions, ...options });
     },
 
@@ -81,7 +81,7 @@ export const showToast = {
         messages: {
             loading: string;
             success: string | ((data: T) => string);
-            error: string | ((error: any) => string);
+            error: string | ((error: Error) => string);
         },
         options?: ToastOptions
     ) => {

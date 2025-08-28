@@ -11,26 +11,7 @@ export const store = configureStore({
         filters: filtersReducer,
         ui: uiReducer,
     },
-    middleware: (getDefaultMiddleware) =>
-        getDefaultMiddleware({
-            serializableCheck: {
-                // Ignore these action types
-                ignoredActions: [
-                    'todosApi/executeQuery/fulfilled',
-                    'todosApi/executeQuery/pending',
-                    'todosApi/executeQuery/rejected',
-                    'todosApi/executeMutation/fulfilled',
-                    'todosApi/executeMutation/pending',
-                    'todosApi/executeMutation/rejected',
-                ],
-                // Ignore these field paths in all actions
-                ignoredActionPaths: ['meta.arg', 'meta.baseQueryMeta', 'payload.timestamp'],
-                // Ignore these paths in the state
-                ignoredPaths: ['todosApi.queries', 'todosApi.mutations'],
-            },
-        })
-            .concat(todosApi.middleware)
-            .concat(errorMiddleware),
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(todosApi.middleware).concat(errorMiddleware),
 });
 
 export type RootState = ReturnType<typeof store.getState>;

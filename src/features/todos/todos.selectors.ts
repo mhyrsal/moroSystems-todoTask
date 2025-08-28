@@ -9,18 +9,8 @@ export const selectTodosLoading = createSelector(selectTodosResult, (todosResult
 
 export const selectTodosError = createSelector(selectTodosResult, (todosResult) => todosResult.error);
 
-export const selectTodoById = (id: string) => createSelector(selectAllTodos, (todos) => todos.find((todo) => todo.id === id));
-
-export const selectActiveTodos = createSelector(selectAllTodos, (todos) => todos.filter((todo) => !todo.completed));
-
-export const selectCompletedTodos = createSelector(selectAllTodos, (todos) => todos.filter((todo) => todo.completed));
-
-export const selectStarredTodos = createSelector(selectAllTodos, (todos) => todos.filter((todo) => todo.starred));
-
 export const selectTodosByPriority = (priority: 'low' | 'medium' | 'high') =>
     createSelector(selectAllTodos, (todos) => todos.filter((todo) => todo.priority === priority));
-
-export const selectTodosWithTag = (tag: string) => createSelector(selectAllTodos, (todos) => todos.filter((todo) => todo.tags?.includes(tag)));
 
 export const selectTodoStats = createSelector(selectAllTodos, (todos) => {
     const total = todos.length;
@@ -52,12 +42,4 @@ export const selectTodoStats = createSelector(selectAllTodos, (todos) => {
         todayCount: todayTodos.length,
         todayCompleted: todayTodos.filter((t) => t.completed).length,
     };
-});
-
-export const selectAllTags = createSelector(selectAllTodos, (todos) => {
-    const tagsSet = new Set<string>();
-    todos.forEach((todo) => {
-        todo.tags?.forEach((tag) => tagsSet.add(tag));
-    });
-    return Array.from(tagsSet).sort();
 });

@@ -26,9 +26,6 @@ const filtersSlice = createSlice({
         setSearchTerm: (state, action: PayloadAction<string>) => {
             state.searchTerm = action.payload;
         },
-        setTags: (state, action: PayloadAction<string[]>) => {
-            state.tags = action.payload;
-        },
         setPriority: (state, action: PayloadAction<FiltersState['priority']>) => {
             state.priority = action.payload;
         },
@@ -38,6 +35,6 @@ const filtersSlice = createSlice({
     },
 });
 
-export const { setFilter, setSearchTerm, setTags, setPriority, clearFilters } = filtersSlice.actions;
+export const { setFilter, setSearchTerm, setPriority, clearFilters } = filtersSlice.actions;
 
 export default filtersSlice.reducer;

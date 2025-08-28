@@ -26,10 +26,6 @@ export const selectFilteredTodos = createSelector(
             filtered = filtered.filter((todo) => todo.priority === filters.priority);
         }
 
-        if (filters.tags.length > 0) {
-            filtered = filtered.filter((todo) => filters.tags.some((tag) => todo.tags?.includes(tag)));
-        }
-
         return filtered;
     }
 );

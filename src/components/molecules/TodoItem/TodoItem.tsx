@@ -1,6 +1,6 @@
 import { useState, forwardRef } from 'react';
 import { motion } from 'framer-motion';
-import { Check, Trash2, Edit2, Star, X, Save, Clock, Calendar } from 'lucide-react';
+import { Check, Trash2, Edit2, Star, X, Save, Clock, Calendar, AlertCircle } from 'lucide-react';
 import { clsx } from 'clsx';
 import { format } from 'date-fns';
 import { TodoItemProps } from './TodoItem.types';
@@ -12,9 +12,18 @@ import { useUpdateTodoMutation, useDeleteTodoMutation } from '@features/todos/to
 import { toast } from '@utils/toast';
 import { useTranslation } from '@/hooks/useTranslation';
 
+type Priority = 'low' | 'medium' | 'high' | undefined;
+
+const priorityOptions: { value: Priority; label: string; color: string }[] = [
+    { value: 'low', label: 'Low', color: 'bg-green-100 text-green-700 hover:bg-green-200' },
+    { value: 'medium', label: 'Medium', color: 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200' },
+    { value: 'high', label: 'High', color: 'bg-red-100 text-red-700 hover:bg-red-200' },
+];
+
 export const TodoItem = forwardRef<HTMLDivElement, TodoItemProps>(({ todo, isOptimistic = false }, ref) => {
     const [isEditing, setIsEditing] = useState(false);
     const [editText, setEditText] = useState(todo.text);
+    const [editPriority, setEditPriority] = useState<Priority>(todo.priority);
     const { t } = useTranslation();
     const [updateTodo, { isLoading: isUpdating }] = useUpdateTodoMutation();
     const [deleteTodo, { isLoading: isDeleting }] = useDeleteTodoMutation();
@@ -32,22 +41,36 @@ export const TodoItem = forwardRef<HTMLDivElement, TodoItemProps>(({ todo, isOpt
     };
 
     const handleSave = async () => {
-        if (editText.trim() && editText !== todo.text) {
+        const textChanged = editText.trim() !== todo.text;
+        const priorityChanged = editPriority !== todo.priority;
+
+        if (!editText.trim()) {
+            toast.error('Todo text cannot be empty');
+            return;
+        }
+
+        if (textChanged || priorityChanged) {
             try {
+                const updates: any = {};
+                if (textChanged) updates.text = editText.trim();
+                if (priorityChanged) updates.priority = editPriority;
+
                 await updateTodo({
                     id: todo.id,
-                    updates: { text: editText.trim() },
+                    updates,
                 }).unwrap();
+
                 setIsEditing(false);
                 toast.success('Todo updated');
             } catch (error) {
                 toast.error('Failed to update todo');
                 console.error('Failed to update todo:', error);
+                // Reset form on error
                 setEditText(todo.text);
+                setEditPriority(todo.priority);
             }
         } else {
             setIsEditing(false);
-            setEditText(todo.text);
         }
     };
 
@@ -75,7 +98,14 @@ export const TodoItem = forwardRef<HTMLDivElement, TodoItemProps>(({ todo, isOpt
 
     const handleCancel = () => {
         setEditText(todo.text);
+        setEditPriority(todo.priority);
         setIsEditing(false);
+    };
+
+    const handleEdit = () => {
+        setEditText(todo.text);
+        setEditPriority(todo.priority);
+        setIsEditing(true);
     };
 
     return (
@@ -112,7 +142,8 @@ export const TodoItem = forwardRef<HTMLDivElement, TodoItemProps>(({ todo, isOpt
             </button>
 
             {isEditing ? (
-                <div className="flex flex-1 gap-2">
+                <div className="flex flex-col flex-1 gap-3">
+                    {/* Text Input */}
                     <Input
                         value={editText}
                         onChange={(e) => setEditText(e.target.value)}
@@ -127,12 +158,40 @@ export const TodoItem = forwardRef<HTMLDivElement, TodoItemProps>(({ todo, isOpt
                         placeholder={t('todoText')}
                         className="flex-1"
                     />
-                    <Button onClick={handleSave} size="sm" variant="success" icon={<Save className="w-4 h-4" />} disabled={isUpdating} loading={isUpdating}>
-                        {t('save')}
-                    </Button>
-                    <Button onClick={handleCancel} size="sm" variant="ghost" icon={<X className="w-4 h-4" />}>
-                        {t('cancel')}
-                    </Button>
+
+                    {/* Priority Selection */}
+                    <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">
+                            <AlertCircle className="w-4 h-4" />
+                            Priority:
+                        </span>
+                        <div className="flex gap-1">
+                            {priorityOptions.map((option) => (
+                                <button
+                                    key={option.value || 'none'}
+                                    type="button"
+                                    onClick={() => setEditPriority(option.value)}
+                                    className={clsx(
+                                        'px-2 py-1 rounded text-xs font-medium transition-colors',
+                                        editPriority === option.value ? 'ring-2 ring-blue-500 ring-offset-1' : '',
+                                        option.color
+                                    )}
+                                >
+                                    {option.label}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex gap-2">
+                        <Button onClick={handleSave} size="sm" variant="success" icon={<Save className="w-4 h-4" />} disabled={isUpdating} loading={isUpdating}>
+                            {t('save')}
+                        </Button>
+                        <Button onClick={handleCancel} size="sm" variant="ghost" icon={<X className="w-4 h-4" />}>
+                            {t('cancel')}
+                        </Button>
+                    </div>
                 </div>
             ) : (
                 <>
@@ -140,7 +199,7 @@ export const TodoItem = forwardRef<HTMLDivElement, TodoItemProps>(({ todo, isOpt
                         <div className="flex items-center gap-2">
                             <span
                                 className={clsx('text-gray-800 dark:text-gray-200', todo.completed && 'line-through opacity-50')}
-                                onDoubleClick={() => !isOptimistic && setIsEditing(true)}
+                                onDoubleClick={() => !isOptimistic && handleEdit()}
                             >
                                 {todo.text}
                             </span>
@@ -182,7 +241,7 @@ export const TodoItem = forwardRef<HTMLDivElement, TodoItemProps>(({ todo, isOpt
                             <Star className="w-4 h-4" fill={todo.starred ? 'currentColor' : 'none'} />
                         </button>
                         <button
-                            onClick={() => setIsEditing(true)}
+                            onClick={handleEdit}
                             disabled={isOptimistic}
                             className="p-1.5 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors rounded"
                             aria-label="Edit todo"
